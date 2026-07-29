@@ -10,71 +10,54 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query(sort: \WorldCity.sortOrder) private var cities: [WorldCity]
+
+    @State private var viewModel = TimeShiftViewModel()
+    @State private var isAddingCity = false
 
     var body: some View {
-        NavigationViewWrapper {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(cities) { city in
+                        CityCardView(city: city, viewModel: viewModel)
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .padding()
             }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
+            .background(Color.black.opacity(0.92))
+            .navigationTitle("TimeShift")
             .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isAddingCity = true
+                    } label: {
+                        Label("Adicionar cidade", systemImage: "plus")
                     }
                 }
             }
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            .sheet(isPresented: $isAddingCity) {
+                CitySearchView()
             }
         }
-    }
-}
-
-fileprivate struct NavigationViewWrapper<Content: View>: View {
-    let content: () -> Content
-
-    var body: some View {
-#if os(macOS)
-        NavigationSplitView {
-            content()
-        } detail: {
-            Text("Select an item")
+        .task {
+            seedInitialCitiesIfNeeded()
         }
-#else
-        content()
-#endif
+    }
+
+    private func seedInitialCitiesIfNeeded() {
+        guard cities.isEmpty else { return }
+        let defaults = [
+            WorldCity(name: "San Francisco", timeZoneIdentifier: "America/Los_Angeles", sortOrder: 0, isPrimary: true),
+            WorldCity(name: "Rome", timeZoneIdentifier: "Europe/Rome", sortOrder: 1),
+            WorldCity(name: "Cairo", timeZoneIdentifier: "Africa/Cairo", sortOrder: 2),
+            WorldCity(name: "London", timeZoneIdentifier: "Europe/London", sortOrder: 3),
+        ]
+        defaults.forEach { modelContext.insert($0) }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(PreviewData.container)
 }
