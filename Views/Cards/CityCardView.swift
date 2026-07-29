@@ -10,65 +10,64 @@ import SwiftUI
 struct CityCardView: View {
     let city: WorldCity
     @Bindable var viewModel: TimeShiftViewModel
-    /// `false` no modo edição — desliga o arraste de horário pra não brigar
-    /// com o gesto de reordenar/apagar que o ContentView ativa nesse modo.
     var isInteractive: Bool = true
     @State private var dragFraction: Double?
+    @State private var cardWidth: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // App fixado em 24h — sem toggle de formato por enquanto.
     private let use24Hour = true
 
     private let cornerRadius: CGFloat = 24
 
     var body: some View {
-        GeometryReader { geo in
-            let fraction = dragFraction ?? viewModel.fraction(for: city)
-            let period = DayPeriod(hour: Int(fraction * 24))
-            
-            ZStack(alignment: .leading) {
-                CityCardBackground(fraction: fraction)
-                    .animation(
-                        viewModel.draggingCityID == city.id ? nil : .easeInOut(duration: 0.6),
-                        value: fraction
-                    )
+        let fraction = dragFraction ?? viewModel.fraction(for: city)
 
-                Rectangle()
-                    .fill(.white.opacity(0.18))
-                    .frame(width: geo.size.width * fraction)
-                    .animation(.smooth(duration: 0.25), value: fraction)
+        ZStack(alignment: .leading) {
+            CityCardBackground(fraction: fraction)
+                .animation(
+                    reduceMotion || viewModel.draggingCityID == city.id ? nil : .easeInOut(duration: 0.6),
+                    value: fraction
+                )
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(city.name)
-                        .font(.headline)
-                    Text(formattedTime())
-                        .font(.system(size: 40, weight: .semibold, design: .rounded))
-                        .contentTransition(.numericText())
-                }
-                .padding()
+            Rectangle()
+                .fill(.white.opacity(0.18))
+                .frame(width: cardWidth * fraction)
+                .animation(reduceMotion ? nil : .smooth(duration: 0.25), value: fraction)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(city.name)
+                    .font(.headline)
+                Text(formattedTime())
+                    .font(.system(.largeTitle, design: .rounded, weight: .semibold))
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
             }
-            // Recorta o conteúdo do ZStack (gradiente + preenchimento) para a
-            // mesma forma usada pelo glassEffect — sem isso, o glassEffect só
-            // desenha o material de vidro nessa forma, mas não recorta o que
-            // está por baixo, e o retângulo do gradiente "vaza" pelos cantos.
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: cornerRadius))
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        let fraction = value.location.x / geo.size.width
-                        dragFraction = min(max(fraction, 0), 1)
-                        viewModel.updateReferenceDate(draggedCity: city, toFraction: dragFraction!)
-                    }
-                    .onEnded { _ in
-                        dragFraction = nil
-                        viewModel.endDragging()
-                    },
-                isEnabled: isInteractive
-            )
-            .opacity(isInteractive ? 1 : 0.85)
-            .sensoryFeedback(.selection, trigger: Int(fraction * 24))
+            .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 1)
+            .padding()
         }
         .frame(height: 120)
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { newValue in
+            cardWidth = newValue
+        }
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: cornerRadius))
+        .gesture(
+            DragGesture(minimumDistance: 12)
+                .onChanged { value in
+                    guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                    guard cardWidth > 0 else { return }
+                    let clamped = min(max(value.location.x / cardWidth, 0), 1)
+                    dragFraction = clamped
+                    viewModel.updateReferenceDate(draggedCity: city, toFraction: clamped)
+                }
+                .onEnded { _ in
+                    dragFraction = nil
+                    viewModel.endDragging()
+                },
+            isEnabled: isInteractive
+        )
+        .opacity(isInteractive ? 1 : 0.85)
+        .sensoryFeedback(.selection, trigger: Int(fraction * 24))
     }
 
     private func formattedTime() -> String {

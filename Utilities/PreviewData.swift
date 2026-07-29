@@ -8,8 +8,6 @@
 import Foundation
 import SwiftData
 
-/// Dados e container em memória usados em `#Preview` (e, futuramente, em testes
-/// de UI). Nada aqui toca o SwiftData "de verdade" do usuário.
 @MainActor
 enum PreviewData {
     static let sampleCities: [WorldCity] = [
@@ -19,7 +17,6 @@ enum PreviewData {
         WorldCity(name: "London", timeZoneIdentifier: "Europe/London", sortOrder: 3),
     ]
 
-    /// `ModelContainer` em memória, pré-populado com `sampleCities`.
     static var container: ModelContainer = {
         let schema = Schema([WorldCity.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)

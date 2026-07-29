@@ -8,82 +8,93 @@
 import SwiftUI
 import SwiftData
 
-/// Sheet de busca e adição de cidade.
-///
-/// Usa `TimeZone.knownTimeZoneIdentifiers` como fonte de dados — não depende
-/// de rede nem de permissão de localização (a alternativa com MapKit /
-/// `MKLocalSearchCompleter` citada no ARCHITECTURE.md fica como upgrade
-/// futuro, se algum dia precisarmos de busca por endereço de verdade).
 struct CitySearchView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Query private var existingCities: [WorldCity]
 
     @State private var searchText = ""
+    @State private var results: [GeocodingResult] = []
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    @State private var searchTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
-            List(filteredIdentifiers, id: \.self) { identifier in
-                Button {
-                    addCity(identifier: identifier)
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(displayName(for: identifier))
-                                .foregroundStyle(.primary)
-                            Text(identifier)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        if isAlreadyAdded(identifier) {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+            List(results) { result in
+                CityResultRow(result: result, isAdded: isAlreadyAdded(result)) {
+                    addCity(result: result)
                 }
-                .disabled(isAlreadyAdded(identifier))
             }
+            .scrollContentBackground(.hidden)
+            .background(AccentGradient.background.ignoresSafeArea())
             .navigationTitle("Adicionar cidade")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: "Buscar cidade ou fuso")
+            .searchable(text: $searchText, prompt: "Buscar cidade")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") { dismiss() }
                 }
             }
             .overlay {
-                if filteredIdentifiers.isEmpty {
-                    ContentUnavailableView.search(text: searchText)
-                }
+                statusOverlay
+            }
+            .onChange(of: searchText) { _, newValue in
+                scheduleSearch(for: newValue)
             }
         }
     }
 
-    /// Sem busca, mostra uma lista curta pra não jogar milhares de fusos na
-    /// tela de cara. Com busca, filtra por identificador ("America/New_York")
-    /// e pelo nome derivado dele ("New York").
-    private var filteredIdentifiers: [String] {
-        let all = TimeZone.knownTimeZoneIdentifiers.sorted()
-        guard !searchText.isEmpty else { return Array(all.prefix(40)) }
-        return all.filter {
-            $0.localizedCaseInsensitiveContains(searchText)
-                || displayName(for: $0).localizedCaseInsensitiveContains(searchText)
+    @ViewBuilder
+    private var statusOverlay: some View {
+        if searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+            ContentUnavailableView("Buscar cidade", systemImage: "magnifyingglass", description: Text("Digite o nome de uma cidade, ex.: Tóquio, Rome, New York"))
+        } else if isLoading {
+            ProgressView()
+        } else if let errorMessage {
+            ContentUnavailableView("Não foi possível buscar", systemImage: "wifi.slash", description: Text(errorMessage))
+        } else if results.isEmpty {
+            ContentUnavailableView.search(text: searchText)
         }
     }
 
-    private func displayName(for identifier: String) -> String {
-        identifier.split(separator: "/").last?.replacingOccurrences(of: "_", with: " ") ?? identifier
+    private func scheduleSearch(for query: String) {
+        searchTask?.cancel()
+        let trimmed = query.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else {
+            results = []
+            errorMessage = nil
+            isLoading = false
+            return
+        }
+
+        searchTask = Task {
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
+
+            isLoading = true
+            errorMessage = nil
+            do {
+                let fetched = try await GeocodingService.search(name: trimmed)
+                guard !Task.isCancelled else { return }
+                results = fetched
+            } catch {
+                guard !Task.isCancelled else { return }
+                results = []
+                errorMessage = "Verifique sua conexão e tente novamente."
+            }
+            isLoading = false
+        }
     }
 
-    private func isAlreadyAdded(_ identifier: String) -> Bool {
-        existingCities.contains { $0.timeZoneIdentifier == identifier }
+    private func isAlreadyAdded(_ result: GeocodingResult) -> Bool {
+        existingCities.contains { $0.timeZoneIdentifier == result.timezone }
     }
 
-    private func addCity(identifier: String) {
-        guard !isAlreadyAdded(identifier) else { return }
+    private func addCity(result: GeocodingResult) {
+        guard !isAlreadyAdded(result) else { return }
         let nextOrder = (existingCities.map(\.sortOrder).max() ?? -1) + 1
-        let city = WorldCity(name: displayName(for: identifier), timeZoneIdentifier: identifier, sortOrder: nextOrder)
+        let city = WorldCity(name: result.name, timeZoneIdentifier: result.timezone, sortOrder: nextOrder)
         modelContext.insert(city)
         dismiss()
     }
