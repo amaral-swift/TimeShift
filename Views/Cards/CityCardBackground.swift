@@ -18,9 +18,9 @@ struct CityCardBackground: View {
         )
         .overlay(
             LinearGradient(
-                colors: [.black.opacity(0), .black.opacity(0.22)],
-                startPoint: .top,
-                endPoint: .bottom
+                colors: [.black.opacity(0.32), .black.opacity(0)],
+                startPoint: .leading,
+                endPoint: .trailing
             )
         )
     }

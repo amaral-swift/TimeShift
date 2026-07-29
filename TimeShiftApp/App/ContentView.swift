@@ -14,26 +14,35 @@ struct ContentView: View {
 
     @State private var viewModel = TimeShiftViewModel()
     @State private var isAddingCity = false
+    @State private var isEditing = false
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(cities) { city in
-                        CityCardView(city: city, viewModel: viewModel)
-                    }
+            List {
+                ForEach(cities) { city in
+                    CityRow(city: city, viewModel: viewModel, isEditing: isEditing, onDelete: delete)
                 }
-                .padding()
+                .onMove(perform: moveCities)
+                .onDelete(perform: deleteCities)
             }
-            .background(Color.black.opacity(0.92))
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background(AccentGradient.background.ignoresSafeArea())
+            .environment(\.editMode, .constant(isEditing ? .active : .inactive))
             .navigationTitle("TimeShift")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isAddingCity = true
-                    } label: {
-                        Label("Adicionar cidade", systemImage: "plus")
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(isEditing ? "Concluído" : "Editar") {
+                        withAnimation {
+                            isEditing.toggle()
+                        }
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Adicionar cidade", systemImage: "plus") {
+                        isAddingCity = true
+                    }
+                    .disabled(isEditing)
                 }
             }
             .sheet(isPresented: $isAddingCity) {
@@ -54,6 +63,22 @@ struct ContentView: View {
             WorldCity(name: "London", timeZoneIdentifier: "Europe/London", sortOrder: 3),
         ]
         defaults.forEach { modelContext.insert($0) }
+    }
+
+    private func moveCities(from source: IndexSet, to destination: Int) {
+        var reordered = cities
+        reordered.move(fromOffsets: source, toOffset: destination)
+        for (index, city) in reordered.enumerated() {
+            city.sortOrder = index
+        }
+    }
+
+    private func delete(_ city: WorldCity) {
+        modelContext.delete(city)
+    }
+
+    private func deleteCities(at offsets: IndexSet) {
+        offsets.map { cities[$0] }.forEach(delete)
     }
 }
 
