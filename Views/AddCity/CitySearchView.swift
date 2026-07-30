@@ -11,6 +11,7 @@ import SwiftData
 struct CitySearchView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @Query private var existingCities: [WorldCity]
 
     @State private var searchText = ""
@@ -27,7 +28,7 @@ struct CitySearchView: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(AccentGradient.background.ignoresSafeArea())
+            .background(AccentGradient.background(for: colorScheme).ignoresSafeArea())
             .navigationTitle("Adicionar cidade")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Buscar cidade")

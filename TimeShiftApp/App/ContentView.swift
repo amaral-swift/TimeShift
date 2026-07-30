@@ -10,6 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.colorScheme) private var colorScheme
     @Query(sort: \WorldCity.sortOrder) private var cities: [WorldCity]
 
     @State private var viewModel = TimeShiftViewModel()
@@ -27,7 +28,7 @@ struct ContentView: View {
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            .background(AccentGradient.background.ignoresSafeArea())
+            .background(AccentGradient.background(for: colorScheme).ignoresSafeArea())
             .environment(\.editMode, .constant(isEditing ? .active : .inactive))
             .navigationTitle("TimeShift")
             .toolbar {

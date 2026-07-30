@@ -13,9 +13,11 @@ struct CityRow: View {
     let isEditing: Bool
     let onDelete: (WorldCity) -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         CityCardView(city: city, viewModel: viewModel, isInteractive: !isEditing)
-            .listRowBackground(Color.clear)
+            .listRowBackground(AccentGradient.background(for: colorScheme))
             .listRowSeparator(.hidden)
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
