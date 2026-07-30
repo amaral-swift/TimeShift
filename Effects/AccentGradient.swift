@@ -8,15 +8,19 @@
 import SwiftUI
 
 enum AccentGradient {
-    static let start = Color(red: 0.18, green: 0.90, blue: 0.77)
-    static let end = Color(red: 0.30, green: 0.44, blue: 1.0)
+    private static let darkColors = [
+        Color(red: 0.02, green: 0.07, blue: 0.07),
+        Color(red: 0.03, green: 0.03, blue: 0.09),
+    ]
 
-    static var background: LinearGradient {
+    private static let lightColors = [
+        Color(red: 0.90, green: 0.99, blue: 0.97),
+        Color(red: 0.92, green: 0.93, blue: 1.0),
+    ]
+
+    static func background(for scheme: ColorScheme) -> LinearGradient {
         LinearGradient(
-            colors: [
-                Color(red: 0.02, green: 0.07, blue: 0.07),
-                Color(red: 0.03, green: 0.03, blue: 0.09),
-            ],
+            colors: scheme == .dark ? darkColors : lightColors,
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

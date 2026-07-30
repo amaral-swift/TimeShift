@@ -42,6 +42,7 @@ struct CityCardView: View {
                     .monospacedDigit()
                     .contentTransition(.numericText())
             }
+            .foregroundStyle(.white)
             .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 1)
             .padding()
         }
@@ -49,7 +50,7 @@ struct CityCardView: View {
         .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { newValue in
             cardWidth = newValue
         }
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .clipShape(.rect(cornerRadius: cornerRadius))
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: cornerRadius))
         .gesture(
             DragGesture(minimumDistance: 12)
