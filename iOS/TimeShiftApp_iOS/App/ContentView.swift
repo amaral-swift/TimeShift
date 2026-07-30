@@ -29,9 +29,12 @@ struct ContentView: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .background(AccentGradient.background(for: colorScheme).ignoresSafeArea())
+            #if os(iOS) || os(iPadOS)
             .environment(\.editMode, .constant(isEditing ? .active : .inactive))
+            #endif
             .navigationTitle("TimeShift")
             .toolbar {
+                #if os(iOS) || os(iPadOS)
                 ToolbarItem(placement: .topBarLeading) {
                     Button(isEditing ? "Concluído" : "Editar") {
                         withAnimation {
@@ -45,6 +48,7 @@ struct ContentView: View {
                     }
                     .disabled(isEditing)
                 }
+                #endif
             }
             .sheet(isPresented: $isAddingCity) {
                 CitySearchView()
