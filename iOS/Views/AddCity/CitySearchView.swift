@@ -30,7 +30,9 @@ struct CitySearchView: View {
             .scrollContentBackground(.hidden)
             .background(AccentGradient.background(for: colorScheme).ignoresSafeArea())
             .navigationTitle("Adicionar cidade")
+            #if os(iOS) || os(iPadOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .searchable(text: $searchText, prompt: "Buscar cidade")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
