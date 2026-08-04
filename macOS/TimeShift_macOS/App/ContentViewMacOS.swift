@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView_macOS: View {
+struct ContentViewMacOS: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \WorldCity.sortOrder) private var cities: [WorldCity]
 
@@ -20,26 +20,41 @@ struct ContentView_macOS: View {
         NavigationStack {
             List {
                 ForEach(cities) { city in
-                    CityRow(city: city, viewModel: viewModel, isEditing: isEditing, onDelete: delete)
+                    HStack(spacing: 12) {
+                        if isEditing {
+                            Button("Remover \(city.name)", systemImage: "minus.circle.fill") {
+                                withAnimation {
+                                    delete(city)
+                                }
+                            }
+                            .labelStyle(.iconOnly)
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.red)
+                            .font(.title2)
+                            .frame(minWidth: 44, minHeight: 44)
+                            .contentShape(.rect)
+                            .transition(.opacity.combined(with: .scale))
+                        }
+                        CityRow(city: city, viewModel: viewModel, isEditing: isEditing, onDelete: delete)
+                    }
                 }
                 .onMove(perform: moveCities)
                 .onDelete(perform: deleteCities)
             }
             .listStyle(.plain)
-            .navigationTitle("TimeShift")
+            .navigationTitle("Fusus")
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button(action: { isAddingCity = true }) {
-                        Label("Adicionar", systemImage: "plus")
-                    }
-                    .disabled(isEditing)
-                }
-                ToolbarItem(placement: .secondaryAction) {
+                ToolbarItemGroup(placement: .primaryAction) {
                     Button(isEditing ? "Concluído" : "Editar") {
                         withAnimation {
                             isEditing.toggle()
                         }
                     }
+                    
+                    Button("Adicionar", systemImage: "plus") {
+                        isAddingCity = true
+                    }
+                    .disabled(isEditing)
                 }
             }
         }
@@ -81,6 +96,6 @@ struct ContentView_macOS: View {
 }
 
 #Preview {
-    ContentView_macOS()
+    ContentViewMacOS()
         .modelContainer(PreviewData.container)
 }

@@ -25,10 +25,17 @@ struct TimeShiftApp_macOS: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView_macOS()
+            ContentViewMacOS()
                 .modelContainer(modelContainer)
         }
         .windowStyle(.automatic)
         .defaultSize(width: 1000, height: 700)
+        
+        MenuBarExtra("Fusus", systemImage: "clock") {
+            MenuBarContentView()
+                .modelContainer(modelContainer)
+                .frame(width: 500, height: 300)
+        }
+        .menuBarExtraStyle(.window)
     }
 }

@@ -57,7 +57,7 @@ struct CitySearchView: View {
         } else if let errorMessage {
             ContentUnavailableView("Não foi possível buscar", systemImage: "wifi.slash", description: Text(errorMessage))
         } else if results.isEmpty {
-            ContentUnavailableView.search(text: searchText)
+            ContentUnavailableView.search
         }
     }
 

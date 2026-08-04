@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct ContentViewiOS: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var colorScheme
     @Query(sort: \WorldCity.sortOrder) private var cities: [WorldCity]
@@ -32,7 +32,7 @@ struct ContentView: View {
             #if os(iOS) || os(iPadOS)
             .environment(\.editMode, .constant(isEditing ? .active : .inactive))
             #endif
-            .navigationTitle("TimeShift")
+            .navigationTitle("Fusus")
             .toolbar {
                 #if os(iOS) || os(iPadOS)
                 ToolbarItem(placement: .topBarLeading) {
@@ -88,6 +88,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentViewiOS()
         .modelContainer(PreviewData.container)
 }

@@ -11,13 +11,12 @@ enum DayPeriod {
     case night, dawn, morning, afternoon, evening
     
     init(hour: Int) {
-        switch hour {
-        case 0..<5: self = .night
-        case 5..<7: self = .dawn
-        case 7..<12: self = .morning
-        case 12..<18: self = .afternoon
-        default: self = .evening
-            
+        self = switch hour {
+        case 0..<5: .night
+        case 5..<7: .dawn
+        case 7..<12: .morning
+        case 12..<18: .afternoon
+        default: .evening
         }
     }
 }
