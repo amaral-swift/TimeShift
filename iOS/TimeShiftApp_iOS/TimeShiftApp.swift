@@ -25,7 +25,7 @@ struct TimeShiftApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentViewiOS()
         }
         .modelContainer(sharedModelContainer)
     }

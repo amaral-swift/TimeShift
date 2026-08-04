@@ -16,13 +16,13 @@ struct CityCardBackground: View {
             startPoint: .top,
             endPoint: .bottom
         )
-        .overlay(
+        .overlay {
             LinearGradient(
                 colors: [.black.opacity(0.32), .black.opacity(0)],
                 startPoint: .leading,
                 endPoint: .trailing
             )
-        )
+        }
     }
 
     private var hour: Double {
@@ -87,7 +87,7 @@ private enum DayPalette {
     HStack(spacing: 8) {
         ForEach([0.0, 0.22, 0.3, 0.45, 0.6, 0.72, 0.85, 0.95], id: \.self) { f in
             CityCardBackground(fraction: f)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .clipShape(.rect(cornerRadius: 16))
         }
     }
     .padding()

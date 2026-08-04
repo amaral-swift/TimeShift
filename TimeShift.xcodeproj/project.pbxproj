@@ -15,20 +15,19 @@
 		38EB0954301BD2ED007504C1 /* Exceptions for "macOS" folder in "TimeShift" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				TimeShift_macOS/App/ContentView.swift,
+				TimeShift_macOS/App/ContentViewMacOS.swift,
 				TimeShift_macOS/Assets.xcassets,
-				TimeShift_macOS/TimeShift_macOSApp.swift,
-				TimeShift_macOS/TimeShift_macOS.entitlements,
+				TimeShift_macOS/TimeShiftMacOSApp.swift,
 			);
 			target = 38B25AF930197240007748F3 /* TimeShift */;
 		};
 		38EB0955301BD2ED007504C1 /* Exceptions for "macOS" folder in "TimeShift_macOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				TimeShift_macOS/App/ContentView.swift,
+				TimeShift_macOS/App/ContentViewMacOS.swift,
 				TimeShift_macOS/Assets.xcassets,
-				TimeShift_macOS/TimeShift_macOSApp.swift,
-				TimeShift_macOS/TimeShift_macOS.entitlements,
+				TimeShift_macOS/TimeShiftMacOSApp.swift,
+				Views/MenuBarContentView.swift,
 			);
 			target = 38EB093D301BD299007504C1 /* TimeShift_macOS */;
 		};
@@ -195,10 +194,10 @@
 				};
 			};
 			buildConfigurationList = 38B25AF530197240007748F3 /* Build configuration list for PBXProject "TimeShift" */;
-			developmentRegion = en;
+			developmentRegion = "pt-BR";
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
+				"pt-BR",
 				Base,
 			);
 			mainGroup = 38B25AF130197240007748F3;
@@ -378,6 +377,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Fusus;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -423,6 +423,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Fusus;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -460,7 +461,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "macOS/TimeShift_macOS/TimeShift_macOS.entitlements";
+				CODE_SIGN_ENTITLEMENTS = macOS/TimeShift_macOS/TimeShift_macOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -470,6 +471,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Fusus;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -495,7 +497,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "macOS/TimeShift_macOS/TimeShift_macOS.entitlements";
+				CODE_SIGN_ENTITLEMENTS = macOS/TimeShift_macOS/TimeShift_macOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -505,6 +507,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Fusus;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
