@@ -80,6 +80,7 @@ struct ContentViewiOS: View {
 
     private func delete(_ city: WorldCity) {
         modelContext.delete(city)
+        try? modelContext.save()
     }
 
     private func deleteCities(at offsets: IndexSet) {
