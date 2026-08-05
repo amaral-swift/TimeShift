@@ -99,6 +99,7 @@ struct CitySearchView: View {
         let nextOrder = (existingCities.map(\.sortOrder).max() ?? -1) + 1
         let city = WorldCity(name: result.name, timeZoneIdentifier: result.timezone, sortOrder: nextOrder)
         modelContext.insert(city)
+        try? modelContext.save()
         dismiss()
     }
 }

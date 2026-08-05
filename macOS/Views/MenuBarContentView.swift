@@ -25,6 +25,7 @@ struct MenuBarContentView: View {
     
     private func delete(_ city: WorldCity) {
         modelContext.delete(city)
+        try? modelContext.save()
     }
 }
 
